@@ -1,6 +1,7 @@
 import express from 'express'
 import pg from 'pg'
 import Joi from 'joi'
+import { startTransition } from 'react'
 
 const app = express()
 const port = 3000
@@ -16,3 +17,22 @@ const pool = new Pool({
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// MIDDLEWARE LOGGING
+
+app.use((req, res, next) => {
+    const start = Date.now()
+
+    res.on('finish', () => {
+        const duration = Date.now() - start
+
+        console.log({
+            method: req.method,
+            url: req.originalUrl,
+            status: res.statusCode,
+            duration: `${duration}ms`,
+        })    
+    })
+
+    next()
+})
